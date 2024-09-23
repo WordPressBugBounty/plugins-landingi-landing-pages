@@ -1,0 +1,45 @@
+{
+  "name": "landingi/wordpress-plugin",
+  "type": "wordpress-plugin",
+  "description": "Landingi wordpress integration plugin",
+  "keywords": [ "wordpress", "plugin", "landingi" ],
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Landingi",
+      "email": "developers@landingi.com",
+      "homepage": "https://landingi.com",
+      "role": "Author"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "composer/installers": "~1.0",
+    "twig/twig": "~1.0",
+    "guzzlehttp/guzzle": "^7.0",
+    "ext-json": "*",
+    "ext-dom": "*",
+    "ext-libxml": "*",
+    "symfony/polyfill-mbstring": "^1.15",
+    "symfony/polyfill-iconv": "^1.15"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^2.0",
+    "phpcompatibility/php-compatibility": "9.3.5",
+    "simplyadmire/composer-plugins" : "^2.1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Landingi\\Wordpress\\Plugin\\": [
+        "src/"
+      ],
+      "Landingi\\Wordpress\\Application\\": [
+        "app/"
+      ]
+    }
+  },
+  "scripts": {
+    "phpcs": "phpcs --ignore=vendor --ignore=node_modules --ignore=resources/js/min --runtime-set testVersion 7.4 --runtime-set installed_paths vendor/phpcompatibility/php-compatibility --standard=PHPCompatibility ."
+  }
+}

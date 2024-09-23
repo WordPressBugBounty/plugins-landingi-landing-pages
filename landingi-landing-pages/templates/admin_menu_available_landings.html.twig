@@ -1,0 +1,114 @@
+<div class="wrap">
+    <h1>Available Landings</h1>
+    {% if error is defined %}
+    <div class="card" style="height: auto;">
+        <h2>Setup your account first!</h2>
+        <p>{{ error }}</p>
+        <a href="{{ settings_url }}" class="button button-primary">Go to settings</a>
+    </div>
+    {% else %}
+    <div id="landings-list">
+        <form method="get">
+            <p class="search-box">
+                <label class="screen-reader-text" for="post-search-input">Search Landings:</label>
+                <input type="hidden" name="page" value="landingi">
+                <input type="search" id="post-search-input" name="s" value="{{ searchPhrase }}">
+                <input type="submit" id="search-submit" class="button" value="Search Landings">
+            </p>
+        </form>
+        <br class="clear">
+        <div id="post-body" class="metabox-holder columns-2">
+            <div id="post-body-content">
+                <div class="meta-box-sortables ui-sortable">
+                    <form method="post" id="landings-list">
+                        <h2 class="screen-reader-text">Available Landings</h2>
+                        <table class="wp-list-table widefat fixed striped pages">
+                            <thead>
+                            <tr>
+                                <th scope="col" id="name" class="manage-column">Name</th>
+                                <th scope="col" id="publish" class="manage-column column-date" style="text-align: right">Status</th>
+                            </tr>
+                            </thead>
+
+                            <tbody id="landing-list">
+                            {% for landing in landings %}
+                            <tr id="landing-{{ landing.getId() }}">
+                                <td data-colname="Name">
+                                    <p class="row-title" style="margin-top: 15px;"><b>{{ landing.getName() }}</b></p>
+                                </td>
+                                <td class="date column-date" data-colname="Status" style="text-align: right">
+                                    <form method="post" action="">
+                                        <input name="_wpnonce" type="hidden" value="{{ nonce }}">
+                                        <input type="hidden" name="landingId" value="{{ landing.getId() }}">
+                                        <input type="hidden" name="landingName" value="{{ landing.getName() }}">
+                                        <input name="submit" id="submit" class="button button-primary" value="Import" type="submit">
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <th scope="col" class="manage-column">Name</th>
+                                <th scope="col" class="manage-column column-date" style="text-align: right">Status</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <br class="clear">
+        <style>
+            .landingi-pagination-page {
+                padding: 8px;
+                text-decoration: none;
+            }
+        </style>
+        <div class="tablenav">
+            <div class="tablenav-pages" style="float: none; text-align: center">
+                <span class="pagination-links">
+                    {% if currentPage > 1 %}
+                        <a class="previous-page button" href="{{ queryUrl }}&landingiPage=1&s={{ searchPhrase }}">«</a>
+                        <a class="previous-page button" href="{{ queryUrl }}&landingiPage={{ currentPage - 1 }}&s={{ searchPhrase }}">‹</a>
+                    {% else %}
+                        <span class="button disabled" aria-hidden="true">«</span>
+                        <span class="button disabled" aria-hidden="true">‹</span>
+                    {% endif %}
+
+                    {% if currentPage - 3 > 0 %}
+                        <a class="landingi-pagination-page" href="{{ queryUrl }}&landingiPage={{ currentPage - 3 }}&s={{ searchPhrase }}">{{ currentPage - 3 }}</a>
+                    {% endif %}
+                    {% if currentPage - 2 > 0 %}
+                        <a class="landingi-pagination-page" href="{{ queryUrl }}&landingiPage={{ currentPage - 2 }}&s={{ searchPhrase }}">{{ currentPage - 2 }}</a>
+                    {% endif %}
+                    {% if currentPage - 1 > 0 %}
+                        <a class="landingi-pagination-page" href="{{ queryUrl }}&landingiPage={{ currentPage - 1 }}&s={{ searchPhrase }}">{{ currentPage - 1 }}</a>
+                    {% endif %}
+
+                    <span class="disabled landingi-pagination-page"><strong>{{ currentPage }}</strong></span>
+
+                    {% if currentPage + 1 <= maxPage %}
+                        <a class="landingi-pagination-page" href="{{ queryUrl }}&landingiPage={{ currentPage + 1 }}&s={{ searchPhrase }}">{{ currentPage + 1 }}</a>
+                    {% endif %}
+                    {% if currentPage + 2 <= maxPage %}
+                        <a class="landingi-pagination-page" href="{{ queryUrl }}&landingiPage={{ currentPage + 2 }}&s={{ searchPhrase }}">{{ currentPage + 2 }}</a>
+                    {% endif %}
+                    {% if currentPage + 3 <= maxPage %}
+                        <a class="landingi-pagination-page" href="{{ queryUrl }}&landingiPage={{ currentPage + 3 }}&s={{ searchPhrase }}">{{ currentPage + 3 }}</a>
+                    {% endif %}
+
+                    {% if currentPage != maxPage %}
+                        <a class="next-page button" href="{{ queryUrl }}&landingiPage={{ currentPage + 1 }}&s={{ searchPhrase }}">›</a>
+                        <a class="next-page button" href="{{ queryUrl }}&landingiPage={{ maxPage }}&s={{ searchPhrase }}">»</a>
+                    {% else %}
+                        <span class="button disabled" aria-hidden="true">›</span>
+                        <span class="button disabled" aria-hidden="true">»</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>

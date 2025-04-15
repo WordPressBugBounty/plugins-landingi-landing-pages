@@ -1,8 +1,9 @@
 ## Wordpress plugin for displaying Landing Pages as a Wordpress post
 Branches:
 
-- `master` - only for compatibility with monorepo structure, should always be up-to-date with `2.x`
-- `2.x` - main branch for Landingi-branded version of the plugin, and a source of releases - **main branch of the repository**
+- `master` - only for compatibility with monorepo structure, should always be up-to-date with `3.x`
+- `3.x` - main branch for Landingi-branded version of the plugin, and a source of releases - **main branch of the repository**
+- `2.x` - main branch for Landingi-branded version of the plugin, and a source of releases for php 5.x
 - `1.x` - legacy branch for Landingi-branded version of the plugin, no longer in development
 - `ub-2.x` - main branch for unbranded version of the plugin, and a source of releases
 - `1.x` - legacy branch for unbranded version of the plugin, no longer in development
@@ -17,11 +18,11 @@ Branches:
 - `php composer-setup.php --install-dir=/bin --filename=composer --version=1.10.26`
 - `php -r "unlink('composer-setup.php');"`
 - `composer install`
-- go to URL `wordpress.landingi.it`
+- go to URL `wordpress.landingi.cc`
 - go through default Wordpress installation process
 - activate landingi plugin
-- change the `landingi_api_url` config option in [landingi-plugin.php](landingi-plugin.php) to `http://api.landingi.it/`
-- change the `landingi_export_url` config option in [landingi-plugin.php](landingi-plugin.php) to `http://lp.landingi.it/`
+- change the `landingi_api_url` config option in [landingi-plugin.php](landingi-plugin.php) to `http://api.landingi.cc/`
+- change the `landingi_export_url` config option in [landingi-plugin.php](landingi-plugin.php) to `http://lp.landingi.cc/`
 - modify the [ApiClientService](src/LandingiPlugin/Service/ApiClientService.php), adding the `'proxy' => 'http://application:80'` option to the Guzzle client
 - modify the [LandendApiClientService](src/LandingiPlugin/Service/LandendApiClientService.php), adding the `'proxy' => 'http://application:80'` option to the Guzzle client
 - profit

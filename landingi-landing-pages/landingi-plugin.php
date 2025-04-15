@@ -3,7 +3,7 @@
 Plugin Name: Landingi Landing pages
 Plugin URI: https://landingi.com/
 Description: Landingi is a Web app to speed up and simplify the process of building, publishing, optimizing and managing landing pages on a large scale for lead generation process. We are integrated with leading marketing tools so that the marketer can take full advantage of his existing marketing stack and deliver more high quality leads.
-Version: 3.1.4
+Version: 3.1.5
 Author: Landingi
 License: GPLv2
 Text Domain: landingi-plugin

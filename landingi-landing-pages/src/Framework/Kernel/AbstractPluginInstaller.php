@@ -3,13 +3,13 @@ namespace Landingi\Wordpress\Plugin\Framework\Kernel;
 
 abstract class AbstractPluginInstaller
 {
-    protected $containerCollection;
+    protected ContainerCollection $containerCollection;
 
     public function __construct(ContainerCollection $containerCollection)
     {
         $this->containerCollection = $containerCollection;
     }
 
-    protected abstract function registerActivatePluginHooks();
-    protected abstract function registerDeactivatePluginHooks();
+    abstract protected function registerActivatePluginHooks();
+    abstract protected function registerDeactivatePluginHooks();
 }

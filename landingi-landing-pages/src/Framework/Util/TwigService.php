@@ -2,29 +2,38 @@
 namespace Landingi\Wordpress\Plugin\Framework\Util;
 
 use Landingi\Wordpress\Plugin\Framework\Kernel\ConfigCollection;
-use Twig_Loader_Filesystem;
-use Twig_Environment;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Loader\FilesystemLoader;
 
 class TwigService
 {
-    private $twig;
-    private $config;
+    private Environment $twig;
+    private ConfigCollection $config;
 
     public function __construct(ConfigCollection $config)
     {
-        $loader = new Twig_Loader_Filesystem(__DIR__ . '/../../../templates');
-        $this->twig = new Twig_Environment($loader);
+        $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
+        $this->twig = new Environment($loader);
         $this->config = $config;
     }
 
-    public function getEngine()
+    public function getEngine(): Environment
     {
         return $this->twig;
     }
 
-    public function render($template, $variables)
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function render($template, $variables): string
     {
         $variables = array_merge($variables, $this->config->getConfigs());
+
         return $this->twig->render($template, $variables);
     }
 }

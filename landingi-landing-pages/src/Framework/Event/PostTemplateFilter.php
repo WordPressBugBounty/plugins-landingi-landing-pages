@@ -5,7 +5,7 @@ use Landingi\Wordpress\Plugin\Framework\Kernel\PluginPartInterface;
 
 class PostTemplateFilter extends AbstractEvent implements PluginPartInterface
 {
-    const FILTER_TAG = 'single_template';
+    public const FILTER_TAG = 'single_template';
 
     public function filter()
     {
@@ -18,7 +18,7 @@ class PostTemplateFilter extends AbstractEvent implements PluginPartInterface
         }
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         add_filter(self::FILTER_TAG, function ($singleTemplate) {
             $this->filterArguments['singleTemplate'] = $singleTemplate;

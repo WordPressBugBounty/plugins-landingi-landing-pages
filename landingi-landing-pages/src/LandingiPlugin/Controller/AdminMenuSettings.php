@@ -10,11 +10,11 @@ class AdminMenuSettings extends AbstractController implements PluginPartInterfac
 {
     use AdminMenuTrait;
 
-    const ACTION_TAG = 'admin_menu';
-    const PAGE_TITLE = 'Landingi Settings';
-    const SUBMENU_TITLE = 'Settings';
-    const MENU_SLUG = 'landingi_settings';
-    const CAPABILITY = 'manage_options';
+    public const ACTION_TAG = 'admin_menu';
+    public const PAGE_TITLE = 'Landingi Settings';
+    public const SUBMENU_TITLE = 'Settings';
+    public const MENU_SLUG = 'landingi_settings';
+    public const CAPABILITY = 'manage_options';
 
     public function action()
     {
@@ -42,7 +42,7 @@ class AdminMenuSettings extends AbstractController implements PluginPartInterfac
         $this->response($this->render('admin_menu_settings.html.twig', $returnData));
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->addAdminSubMenuPage(AdminMenuAvailableLandings::MENU_SLUG);
     }

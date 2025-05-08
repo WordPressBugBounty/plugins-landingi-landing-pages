@@ -5,40 +5,23 @@ use Landingi\Wordpress\Plugin\LandingiPlugin\Model\Landing;
 
 class LightboxHandlerNode implements WrappedNode
 {
-    /**
-     * @var \DOMDocument
-     */
-    private $domDocument;
+    private \DOMDocument $domDocument;
 
-    /**
-     * @var Landing
-     */
-    private $landing;
+    private Landing $landing;
 
-    /**
-     * @var string
-     */
-    private $siteUrl;
+    private string $siteUrl;
 
-    /**
-     * @var string
-     */
-    private $postName;
+    private string $postName;
 
-    /**
-     * @var string
-     */
-    private $exportUrl;
+    private string $exportUrl;
 
-    /**
-     * @param \DOMDocument $domDocument
-     * @param Landing $landing
-     * @param string $siteUrl
-     * @param string $postName
-     * @param string $exportUrl
-     */
-    public function __construct(\DOMDocument $domDocument, Landing $landing, $siteUrl, $postName, $exportUrl)
-    {
+    public function __construct(
+        \DOMDocument $domDocument,
+        Landing $landing,
+        string $siteUrl,
+        string $postName,
+        string $exportUrl
+    ) {
         $this->domDocument = $domDocument;
         $this->landing = $landing;
         $this->siteUrl = $siteUrl;
@@ -46,31 +29,25 @@ class LightboxHandlerNode implements WrappedNode
         $this->exportUrl = $exportUrl;
     }
 
-    /**
-     * @return string
-     */
-    private function getValue()
+    public function getDomNode(): \DOMNode
+    {
+        return $this->domDocument->createElement('script', $this->getValue());
+    }
+
+    private function getValue(): string
     {
         $redirectUrl = sprintf('%s/%s', $this->siteUrl, $this->postName);
 
         return <<<JS
 if (typeof Lightbox !== 'undefined') {
     Lightbox.init({
-        exportUrl: '{$this->exportUrl}',
+        exportUrl: '$this->exportUrl',
         hash: '{$this->landing->getHash()}',
         tid: '{$this->landing->getTestId()}',
-        redirectUrl: '{$redirectUrl}'
+        redirectUrl: '$redirectUrl'
     });
     Lightbox.register();
 }
 JS;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getDomNode()
-    {
-        return $this->domDocument->createElement('script', $this->getValue());
     }
 }

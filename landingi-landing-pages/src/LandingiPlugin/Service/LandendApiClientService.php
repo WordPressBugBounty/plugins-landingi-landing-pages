@@ -4,12 +4,13 @@ namespace Landingi\Wordpress\Plugin\LandingiPlugin\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Model\Landing;
+use Psr\Http\Message\ResponseInterface;
 
 class LandendApiClientService
 {
-    private $guzzle;
-    private $landingListPath = '/api/render';
-    private $disallowedStatusCodes = [301, 302, 307, 308];
+    private Client $guzzle;
+    private string $landingListPath = '/api/render';
+    private array $disallowedStatusCodes = [301, 302, 307, 308];
 
     public function __construct($url)
     {
@@ -24,8 +25,12 @@ class LandendApiClientService
      *
      * @return array
      */
-    public function getLandingFromApi(Landing $landing, $currentHost, $currentPath, $conversionHash = null)
-    {
+    public function getLandingFromApi(
+        Landing $landing,
+        string $currentHost,
+        string $currentPath,
+        ?string $conversionHash = null
+    ): array {
         $data = [
             'export_hash' => $landing->getHash(),
             'tid' => $landing->getTestId()
@@ -50,11 +55,11 @@ class LandendApiClientService
 
         return array_merge(
             ['status_code' => $response->getStatusCode()],
-            json_decode($response->getBody()->getContents(), true)
+            json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR)
         );
     }
 
-    private function createClient($url)
+    private function createClient($url): Client
     {
         return new Client([
             'base_uri' => $url,
@@ -62,7 +67,7 @@ class LandendApiClientService
         ]);
     }
 
-    private function get($path, array $params, array $headers = [])
+    private function get($path, array $params, array $headers = []): ResponseInterface
     {
         return $this->guzzle->get($path, [
             'query' => $params,
@@ -70,11 +75,7 @@ class LandendApiClientService
         ]);
     }
 
-    /**
-     * @param RequestException $e
-     * @return array
-     */
-    private function handleExceptionResponses(RequestException $e)
+    private function handleExceptionResponses(RequestException $e): array
     {
         $response = $e->getResponse();
 

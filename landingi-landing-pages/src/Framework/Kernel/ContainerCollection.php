@@ -3,10 +3,10 @@ namespace Landingi\Wordpress\Plugin\Framework\Kernel;
 
 class ContainerCollection
 {
-    protected $containers = [];
-    protected static $instance;
+    protected array $containers = [];
+    private static ?ContainerCollection $instance = null;
 
-    public static function getInstance()
+    public static function getInstance(): ContainerCollection
     {
         if (self::$instance === null) {
             self::$instance = new self;
@@ -15,12 +15,12 @@ class ContainerCollection
         return self::$instance;
     }
 
-    public function getContainers()
+    public function getContainers(): array
     {
         return $this->containers;
     }
 
-    public function setContainers($containers)
+    public function setContainers($containers): void
     {
         $this->containers = $containers;
     }
@@ -30,7 +30,7 @@ class ContainerCollection
         return $this->containers[$containerSlug];
     }
 
-    public function set($containerSlug, $container)
+    public function set($containerSlug, $container): void
     {
         $this->containers[$containerSlug] = $container;
     }

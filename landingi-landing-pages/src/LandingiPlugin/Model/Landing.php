@@ -60,7 +60,7 @@ class Landing implements JsonSerializable
         return $this->testId;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return get_object_vars($this);
     }

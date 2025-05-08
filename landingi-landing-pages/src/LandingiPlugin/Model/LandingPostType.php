@@ -9,13 +9,10 @@ class LandingPostType extends PostType implements PluginPartInterface
 {
     use PostTypeTrait;
 
-    const POST_TYPE = 'landing';
-    const ACTION_TAG = 'init';
+    public const POST_TYPE = 'landing';
+    public const ACTION_TAG = 'init';
 
-    /**
-     * @var string
-     */
-    private $templatePath;
+    private string $templatePath;
 
     public function __construct($templatePath)
     {
@@ -45,7 +42,7 @@ class LandingPostType extends PostType implements PluginPartInterface
         ];
     }
 
-    public function getColumns($columns)
+    public function getColumns($columns): array
     {
         return [
             'cb' => '<input type="checkbox" />',
@@ -55,14 +52,10 @@ class LandingPostType extends PostType implements PluginPartInterface
         ];
     }
 
-    public function renderColumns($column, $postId)
+    public function renderColumns($column, $postId): void
     {
-        switch ($column) {
-            case 'url':
-                echo sprintf('<a href="%s" target="_blank">%s</a>', esc_url(get_permalink()), esc_url(get_permalink()));
-                break;
-            default:
-                break;
+        if ('url' === $column) {
+            echo sprintf('<a href="%s" target="_blank">%s</a>', esc_url(get_permalink()), esc_url(get_permalink()));
         }
     }
 
@@ -83,7 +76,7 @@ class LandingPostType extends PostType implements PluginPartInterface
         }, 10, 2 );
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->addPostType($this->parameters);
         $this->removeCategorySlug();

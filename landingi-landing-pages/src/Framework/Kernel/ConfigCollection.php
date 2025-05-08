@@ -3,10 +3,10 @@ namespace Landingi\Wordpress\Plugin\Framework\Kernel;
 
 class ConfigCollection
 {
-    protected $configs = [];
-    protected static $instance;
+    protected array $configs = [];
+    private static ?ConfigCollection $instance = null;
 
-    public static function getInstance()
+    public static function getInstance(): ConfigCollection
     {
         if (self::$instance === null) {
             self::$instance = new self;
@@ -15,12 +15,12 @@ class ConfigCollection
         return self::$instance;
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return $this->configs;
     }
 
-    public function setConfigs($configs)
+    public function setConfigs($configs): void
     {
         $this->configs = $configs;
     }
@@ -30,7 +30,7 @@ class ConfigCollection
         return $this->configs[$configSlug];
     }
 
-    public function set($configSlug, $value)
+    public function set($configSlug, $value): void
     {
         $this->configs[$configSlug] = $value;
     }

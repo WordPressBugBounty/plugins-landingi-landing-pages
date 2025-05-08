@@ -3,9 +3,9 @@ namespace Landingi\Wordpress\Plugin\Framework\Model;
 
 abstract class PostType
 {
-    protected $parameters = [];
+    protected array $parameters = [];
 
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }

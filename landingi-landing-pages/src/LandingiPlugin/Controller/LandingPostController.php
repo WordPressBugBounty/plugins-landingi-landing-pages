@@ -14,19 +14,8 @@ use Landingi\Wordpress\Plugin\LandingiPlugin\Service\LandendApiClientService;
 
 class LandingPostController extends PostController
 {
-    const LIGHTBOX_MIN_JS_HANDLER = 'lightbox-handler.min.js';
+    private LandendApiClientService $landendApiClientService;
 
-    /**
-     * @var LandendApiClientService
-     */
-    private $landendApiClientService;
-
-    /**
-     * @param TwigService $twigService
-     * @param Request $request
-     * @param ConfigCollection $configCollection
-     * @param LandendApiClientService $landendApiClientService
-     */
     public function __construct(
         TwigService $twigService,
         Request $request,
@@ -39,13 +28,9 @@ class LandingPostController extends PostController
 
     public function action($customPost = null)
     {
-        if ($customPost == null) {
-            $object = get_queried_object();
-        } else {
-            $object = $customPost;
-        }
+        $object = $customPost ?? get_queried_object();
 
-        $landingData = json_decode((string) $object->post_content, true);
+        $landingData = json_decode((string)$object->post_content, true, 512, JSON_THROW_ON_ERROR);
         $landing = new Landing(
             $landingData['id'],
             $landingData['name'],
@@ -97,14 +82,10 @@ class LandingPostController extends PostController
     }
 
     /**
-     * @param string $content
-     * @param Landing $landing
-     * @param $object
      * @throws EmptyDomContentException
      * @throws NodeDoesNotExistsException
-     * @return string
      */
-    private function injectLightboxJsHandler($content, Landing $landing, $object)
+    private function injectLightboxJsHandler(string $content, Landing $landing, $object): string
     {
         $domDocumentWrapper = new DomDocumentWrapper($content);
         $domDocumentWrapper->insertAfterScriptSourceRegex(
@@ -121,12 +102,7 @@ class LandingPostController extends PostController
         return $domDocumentWrapper->save();
     }
 
-    /**
-     * @param Landing $landing
-     * @param $object
-     * @return string|string[]|null
-     */
-    private function modifyFormAndRedirectInputEndpoints(Landing $landing, $object)
+    private function modifyFormAndRedirectInputEndpoints(Landing $landing, $object): array|string|null
     {
         return preg_replace(
             '/(<input type="hidden" name="_redirect" value)="">/',
@@ -148,12 +124,7 @@ class LandingPostController extends PostController
         );
     }
 
-    /**
-     * @param $content
-     * @param Landing $landing
-     * @return string|string[]|null
-     */
-    private function modifyButtonSubmissionEndpoints($content, Landing $landing)
+    private function modifyButtonSubmissionEndpoints(string $content, Landing $landing): array|string|null
     {
         return preg_replace(
             '/ href="(?:\/[^\/]+)?(\/button\/[a-zA-z0-9]{32})"/',
@@ -176,11 +147,7 @@ class LandingPostController extends PostController
         );
     }
 
-    /**
-     * @param string $url
-     * @return string
-     */
-    private function removeInternalQueryParameters($url)
+    private function removeInternalQueryParameters(string $url): string
     {
         $parsedUrl = parse_url($url);
         $queryArray = [];
@@ -198,10 +165,10 @@ class LandingPostController extends PostController
         $path = !empty($parsedUrl['path']) ? $parsedUrl['path'] : '';
         $query = !empty($queryString) ? "?$queryString" : '';
 
-        return "{$scheme}{$host}{$path}{$query}";
+        return "$scheme$host$path$query";
     }
 
-    private function fixBrokenHtmlTags($htmlString)
+    private function fixBrokenHtmlTags($htmlString): array|string
     {
         /*
          * </g is treated as a closing html tag by the parser and is cut out - it's actually part of a regexp inside

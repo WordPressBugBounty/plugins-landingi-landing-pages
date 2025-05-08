@@ -18,33 +18,19 @@ class AdminMenuAvailableLandings extends AbstractController implements PluginPar
 {
     use AdminMenuTrait;
 
-    const ACTION_TAG = 'admin_menu';
-    const PAGE_TITLE = 'Available Landings';
-    const SUBMENU_TITLE = 'Available Landings';
-    const MENU_SLUG = 'landingi';
-    const MENU_ICON = 'landingi_logo.png';
-    const MENU_TITLE = 'Landingi';
-    const CAPABILITY = 'manage_options';
-    const TWIG_TEMPLATE = 'admin_menu_available_landings.html.twig';
-    const TWIG_TEMPLATE_SUCCESS = 'admin_menu_publish_landing_success.html.twig';
+    public const ACTION_TAG = 'admin_menu';
+    public const PAGE_TITLE = 'Available Landings';
+    public const SUBMENU_TITLE = 'Available Landings';
+    public const MENU_SLUG = 'landingi';
+    public const MENU_ICON = 'landingi_logo.png';
+    public const MENU_TITLE = 'Landingi';
+    public const CAPABILITY = 'manage_options';
+    public const TWIG_TEMPLATE = 'admin_menu_available_landings.html.twig';
+    public const TWIG_TEMPLATE_SUCCESS = 'admin_menu_publish_landing_success.html.twig';
 
-    /**
-     * @var ApiClientService
-     */
-    private $apiClientService;
+    private ApiClientService $apiClientService;
+    private LandingPostType $landingPostType;
 
-    /**
-     * @var LandingPostType
-     */
-    private $landingPostType;
-
-    /**
-     * @param TwigService $twigService
-     * @param Request $request
-     * @param ApiClientService $apiClientService
-     * @param LandingPostType $landingPostType
-     * @param ConfigCollection $configCollection
-     */
     public function __construct(
         TwigService $twigService,
         Request $request,
@@ -76,7 +62,7 @@ class AdminMenuAvailableLandings extends AbstractController implements PluginPar
 
         $landingSearchPhrase = $this->request->getGetParameter('s');
         $page = (int) $this->request->getGetParameter('landingiPage');
-        $page = isset($page) && $page > 0 ? $page : 1;
+        $page = max($page, 1);
 
         try {
             $response = $this->apiClientService->getLandingsForAccount($page, $landingSearchPhrase);
@@ -116,7 +102,7 @@ class AdminMenuAvailableLandings extends AbstractController implements PluginPar
         ]));
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->addAdminMenuPage();
         $this->addAdminSubMenuPage(self::MENU_SLUG);

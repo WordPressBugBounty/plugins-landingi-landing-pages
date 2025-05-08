@@ -8,7 +8,7 @@ use Landingi\Wordpress\Plugin\LandingiPlugin\LandingiWordpressPlugin;
 
 class PluginInstaller extends AbstractPluginInstaller implements PluginPartInterface
 {
-    const PLUGIN_LANDINGI_TOKEN = 'landingi_plugin_token';
+    public const PLUGIN_LANDINGI_TOKEN = 'landingi_plugin_token';
 
     private $pluginPath;
 
@@ -64,7 +64,7 @@ class PluginInstaller extends AbstractPluginInstaller implements PluginPartInter
         });
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->registerActivatePluginHooks();
         $this->registerDeactivatePluginHooks();

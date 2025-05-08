@@ -14,7 +14,7 @@ use Landingi\Wordpress\Plugin\LandingiPlugin\Controller\AdminMenuAvailableLandin
 class LandingiWordpressPlugin extends PluginKernel
 {
     const NAME = 'Landingi Landing Pages';
-    const REQUIRED_PHP = '5.5';
+    const REQUIRED_PHP = '8.1';
 
     protected function initializeContainers()
     {

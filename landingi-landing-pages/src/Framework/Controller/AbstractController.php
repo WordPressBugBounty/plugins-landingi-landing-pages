@@ -8,11 +8,11 @@ use Landingi\Wordpress\Plugin\Framework\Util\TwigService;
 
 abstract class AbstractController
 {
-    private $twigService;
-    private $configCollection;
-    protected $request;
+    private TwigService $twigService;
+    private ConfigCollection $configCollection;
+    protected Request $request;
 
-    public abstract function action();
+    abstract public function action();
 
     public function __construct(TwigService $twigService, Request $request, ConfigCollection $configCollection)
     {
@@ -31,7 +31,7 @@ abstract class AbstractController
         return $this->twigService->render($template, $variables);
     }
 
-    protected function setCookie($name, $value)
+    protected function setCookie($name, $value): void
     {
         setcookie($name, $value, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
     }

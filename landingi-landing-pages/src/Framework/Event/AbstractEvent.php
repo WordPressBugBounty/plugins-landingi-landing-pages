@@ -5,13 +5,13 @@ use Landingi\Wordpress\Plugin\Framework\Kernel\ContainerCollection;
 
 abstract class AbstractEvent
 {
-    protected $containerCollection;
-    protected $filterArguments;
+    protected ContainerCollection $containerCollection;
+    protected array $filterArguments;
 
     public function __construct(ContainerCollection $containerCollection)
     {
         $this->containerCollection = $containerCollection;
     }
 
-    public abstract function filter();
+    abstract public function filter();
 }

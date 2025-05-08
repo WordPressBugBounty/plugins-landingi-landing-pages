@@ -13,18 +13,19 @@ class PageTemplater {
     /**
      * A reference to an instance of this class.
      */
-    private static $instance;
+    private static ?PageTemplater $instance = null;
 
     /**
      * The array of templates that this plugin tracks.
      */
-    protected $templates;
+    protected array $templates;
 
     /**
      * Returns an instance of this class.
      */
-    public static function get_instance() {
-        if (null == self::$instance) {
+    public static function get_instance(): ?PageTemplater
+    {
+        if (null === self::$instance) {
             self::$instance = new PageTemplater();
         }
 
@@ -38,7 +39,7 @@ class PageTemplater {
         $this->templates = array();
 
         // Add a filter to the attributes metabox to inject template into the cache.
-        if ( version_compare( floatval( get_bloginfo( 'version' ) ), '4.7', '<' ) ) {
+        if ( version_compare((float) get_bloginfo('version'), '4.7', '<')) {
             // 4.6 and older
             add_filter(
                 'page_attributes_dropdown_pages_args',
@@ -72,18 +73,17 @@ class PageTemplater {
 
     /**
      * Adds our template to the page dropdown for v4.7+
-     *
      */
-    public function add_new_template( $posts_templates ) {
-        $posts_templates = array_merge( $posts_templates, $this->templates );
-        return $posts_templates;
+    public function add_new_template($posts_templates): array
+    {
+        return array_merge($posts_templates, $this->templates);
     }
 
     /**
      * Adds our template to the pages cache in order to trick WordPress
      * into thinking the template file exists where it doens't really exist.
      */
-    public function register_project_templates( $atts ) {
+    public function register_project_templates($atts) {
         // Create the key used for the themes cache
         $cache_key = 'page_templates-' . md5( get_theme_root() . '/' . get_stylesheet() );
 
@@ -148,4 +148,4 @@ class PageTemplater {
         return $template;
     }
 }
-add_action( 'plugins_loaded', array('Landingi\Wordpress\Plugin\LandingiPlugin\PageTemplater', 'get_instance'));
+add_action( 'plugins_loaded', array(PageTemplater::class, 'get_instance'));

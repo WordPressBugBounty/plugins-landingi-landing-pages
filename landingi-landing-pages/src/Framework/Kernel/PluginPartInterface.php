@@ -3,5 +3,5 @@ namespace Landingi\Wordpress\Plugin\Framework\Kernel;
 
 interface PluginPartInterface
 {
-    public function initialize();
+    public function initialize(): void;
 }

@@ -9,12 +9,13 @@ class AdminMenuImportedLandings implements PluginPartInterface
 {
     use AdminMenuTrait;
 
-    const ACTION_TAG = 'admin_menu';
-    const PAGE_TITLE = 'Imported Landings';
-    const SUBMENU_TITLE = 'Imported Landings';
-    const CAPABILITY = 'manage_options';
+    public const ACTION_TAG = 'admin_menu';
+    public const PAGE_TITLE = 'Imported Landings';
+    public const SUBMENU_TITLE = 'Imported Landings';
+    public const CAPABILITY = 'manage_options';
 
-    public function noticeHomepageSuccess() {
+    public function noticeHomepageSuccess(): void
+    {
         ?>
         <div class="notice notice-success is-dismissible">
             <p>Homepage successfully changed!</p>
@@ -34,13 +35,13 @@ class AdminMenuImportedLandings implements PluginPartInterface
                 return;
             }
 
-            if (!isset($_REQUEST['land']) || empty($_REQUEST['land'])) {
+            if (empty($_REQUEST['land'])) {
                 return;
             }
 
             $action = strip_tags((string) wp_unslash($_REQUEST['land']));
 
-            if ($action == 'setashomepage') {
+            if ($action === 'setashomepage') {
                 if (!wp_verify_nonce($_REQUEST['_wpnonce'], 'setashomepage-token')) {
                     show_message('<div class="notice notice-error is-dismissible"><p>Wrong nonce passed. Try again!</p></div>');
                     die();
@@ -54,7 +55,7 @@ class AdminMenuImportedLandings implements PluginPartInterface
 
                 $landing_title = 'Landingi Home Page';
                 $landing_check = get_page_by_title($landing_title);
-                $landing_check_id = isset($landing_check->ID) ? $landing_check->ID : 0;
+                $landing_check_id = $landing_check->ID ?? 0;
                 $landing_homepage = [
                     'post_type'     => 'page',
                     'post_status'   => 'publish',
@@ -75,7 +76,7 @@ class AdminMenuImportedLandings implements PluginPartInterface
         });
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->addPostTypeInSubMenu(AdminMenuAvailableLandings::MENU_SLUG, LandingPostType::POST_TYPE);
         $this->setAsHomepage();

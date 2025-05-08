@@ -8,8 +8,8 @@ use Landingi\Wordpress\Plugin\Framework\Util\TwigService;
 
 abstract class PluginKernel
 {
-    protected $containerCollection;
-    protected $configCollection;
+    protected ContainerCollection $containerCollection;
+    protected ConfigCollection $configCollection;
 
     public function __construct()
     {
@@ -17,19 +17,19 @@ abstract class PluginKernel
         $this->configCollection = ConfigCollection::getInstance();
     }
 
-    protected static $instance;
+    protected static ?PluginKernel $instance = null;
 
-    public static function getInstance()
+    public static function getInstance(): PluginKernel
     {
         if (self::$instance === null) {
-            $class = get_called_class();
+            $class = static::class;
             self::$instance = new $class();
         }
 
         return self::$instance;
     }
 
-    public function addConfig($key, $value)
+    public function addConfig($key, $value): void
     {
         $this->configCollection->set($key, $value);
     }
@@ -39,7 +39,7 @@ abstract class PluginKernel
         return $this->configCollection->get($key);
     }
 
-    private function initializeKernelContainers()
+    private function initializeKernelContainers(): void
     {
         $this->containerCollection->set('framework.kernel', $this);
         $this->containerCollection->set('framework.http.request', new Request($_GET, $_POST, $_COOKIE, $_SERVER));
@@ -48,15 +48,15 @@ abstract class PluginKernel
         $this->containerCollection->set('framework.post.template.filter', new PostTemplateFilter($this->containerCollection));
     }
 
-    protected abstract function initializeContainers();
+    abstract protected function initializeContainers();
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->initializeKernelContainers();
         $this->initializeContainers();
 
         array_map(
-            function ($component) {
+            static function ($component) {
                 if ($component instanceof PluginPartInterface) {
                     $component->initialize();
                 }
@@ -67,7 +67,7 @@ abstract class PluginKernel
 
     public function dispatchPost($landingPost = null)
     {
-        if ($landingPost == null) {
+        if ($landingPost === null) {
             return $this->containerCollection->get('postcontroller.' . get_queried_object()->post_type)->action();
         }
 

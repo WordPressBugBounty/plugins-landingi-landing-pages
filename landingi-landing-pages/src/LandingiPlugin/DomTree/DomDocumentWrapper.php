@@ -10,18 +10,14 @@ use Landingi\Wordpress\Plugin\LandingiPlugin\DomTree\Nodes\WrappedNode;
 
 class DomDocumentWrapper
 {
-    const DEFAULT_ENCODING_CHARSET = 'UTF-8';
+    public const DEFAULT_ENCODING_CHARSET = 'UTF-8';
+
+    private DOMDocument $domDocument;
 
     /**
-     * @var DOMDocument
-     */
-    private $domDocument;
-
-    /**
-     * @param string $domContent
      * @throws EmptyDomContentException
      */
-    public function __construct($domContent)
+    public function __construct(string $domContent)
     {
         if (empty($domContent)) {
             throw new EmptyDomContentException('Dom content cannot be empty');
@@ -32,16 +28,12 @@ class DomDocumentWrapper
 
         // The mbstring extension is required but if the server does not have it installed then polyfill is used as a replacement
         $this->domDocument->loadHTML(
-            mb_convert_encoding($domContent, 'HTML-ENTITIES', self::DEFAULT_ENCODING_CHARSET),
+            mb_encode_numericentity($domContent, [0x80, 0x10FFFF, 0, ~0], self::DEFAULT_ENCODING_CHARSET),
             LIBXML_NOERROR
         );
     }
 
-    /**
-     * @param string $regex
-     * @param WrappedNode $node
-     */
-    public function insertAfterScriptSourceRegex($regex, WrappedNode $node)
+    public function insertAfterScriptSourceRegex(string $regex, WrappedNode $node): void
     {
         $scriptNodes = $this->domDocument->getElementsByTagName('script');
 
@@ -51,38 +43,35 @@ class DomDocumentWrapper
 
         /** @var DOMNode $scriptNode */
         foreach ($scriptNodes as $key => $scriptNode) {
-            if ($scriptNode->hasAttributes()) {
-                if ($sourceAttribute = $scriptNode->attributes->getNamedItem('src')) {
-                    if ($this->hasNextNode($scriptNodes, $key) && $this->matchRegex($sourceAttribute, $regex)) {
-                        $this->getHeadNode()->insertBefore($node->getDomNode(), $scriptNodes[$key + 1]);
-                    }
-                }
+            if (
+                $scriptNode->hasAttributes()
+                && ($sourceAttribute = $scriptNode->attributes->getNamedItem('src'))
+                && $this->hasNextNode($scriptNodes, $key)
+                && $this->matchRegex($sourceAttribute, $regex)
+            ) {
+                $this->getHeadNode()->insertBefore($node->getDomNode(), $scriptNodes[$key + 1]);
             }
         }
     }
 
-    /**
-     * @return string
-     */
-    public function save()
+    public function save(): string
     {
-        return html_entity_decode($this->domDocument->saveHTML(), ENT_HTML5, self::DEFAULT_ENCODING_CHARSET);
+        return html_entity_decode(
+            $this->domDocument->saveHTML(),
+            ENT_HTML5,
+            self::DEFAULT_ENCODING_CHARSET
+        );
     }
 
-    /**
-     * @return DOMDocument
-     */
-    public function getDomDocument()
+    public function getDomDocument(): DOMDocument
     {
         return $this->domDocument;
     }
 
     /**
-     * @param int $offset
      * @throws NodeDoesNotExistsException
-     * @return DOMNode
      */
-    protected function getHeadNode($offset = 0)
+    protected function getHeadNode(int $offset = 0): DOMNode
     {
         $headNodes = $this->domDocument->getElementsByTagName('head');
 
@@ -93,22 +82,12 @@ class DomDocumentWrapper
         return $headNodes->item($offset);
     }
 
-    /**
-     * @param DOMNodeList $scriptNodes
-     * @param int $key
-     * @return bool
-     */
-    private function hasNextNode(DOMNodeList $scriptNodes, $key)
+    private function hasNextNode(DOMNodeList $scriptNodes, int $key): bool
     {
         return isset($scriptNodes[$key + 1]);
     }
 
-    /**
-     * @param DOMNode|null $sourceAttribute
-     * @param string $regex
-     * @return bool
-     */
-    private function matchRegex(DOMNode $sourceAttribute, $regex)
+    private function matchRegex(?DOMNode $sourceAttribute, string $regex): bool
     {
         return $sourceAttribute !== null && preg_match($regex, $sourceAttribute->textContent);
     }

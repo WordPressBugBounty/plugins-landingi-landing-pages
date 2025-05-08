@@ -4,9 +4,9 @@ namespace Landingi\Wordpress\Plugin\LandingiPlugin\Model;
 class LandingCollection
 {
     private $landings = [];
-    private $count;
+    private int $count;
 
-    public function createFromApiResponse($data)
+    public function createFromApiResponse($data): void
     {
         foreach ($data['landings'] as $landing) {
             $this->landings[$landing['id']] = new Landing(
@@ -20,12 +20,12 @@ class LandingCollection
         $this->count = $data['count'];
     }
 
-    public function addLanding(Landing $landing)
+    public function addLanding(Landing $landing): void
     {
         $this->landings[$landing->getId()] = $landing;
     }
 
-    public function getLandings()
+    public function getLandings(): array
     {
         return $this->landings;
     }
@@ -35,7 +35,7 @@ class LandingCollection
         return $this->landings[$id];
     }
 
-    public function getCount()
+    public function getCount(): int
     {
         return $this->count;
     }

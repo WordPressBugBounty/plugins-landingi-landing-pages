@@ -29,7 +29,7 @@ class ApiClientService
         try {
             $request = $this->get($this->landingListPath, ['page' => $page, 'searchPhrase' => $searchPhrase]);
         } catch (ClientException $exception) {
-            throw new InvalidTokenException($exception->getMessage());
+            throw new InvalidTokenException();
         } catch (ServerException $exception) {
             throw new LandingiApiErrorException();
         }

@@ -5,6 +5,7 @@ use Landingi\Wordpress\Plugin\Framework\Event\PostTemplateFilter;
 use Landingi\Wordpress\Plugin\Framework\Http\Request;
 use Landingi\Wordpress\Plugin\Framework\Model\PostTypeCollection;
 use Landingi\Wordpress\Plugin\Framework\Util\TwigService;
+use Throwable;
 
 abstract class PluginKernel
 {
@@ -67,10 +68,104 @@ abstract class PluginKernel
 
     public function dispatchPost($landingPost = null)
     {
-        if ($landingPost === null) {
-            return $this->containerCollection->get('postcontroller.' . get_queried_object()->post_type)->action();
+        if ($landingPost !== null) {
+            return $this->containerCollection->get('postcontroller.landing')->action($landingPost);
         }
 
-        return $this->containerCollection->get('postcontroller.landing')->action($landingPost);
+        $post = $this->determinePostObject();
+
+        if (isset($post->post_type)) {
+            $serviceName = "postcontroller.{$post->post_type}";
+            $controller = $this->containerCollection->get($serviceName);
+
+            if (isset($controller)) {
+                return $controller->action($post);
+            }
+        }
+
+        return null;
+    }
+
+    private function determinePostObject(): \WP_Post|null
+    {
+        try {
+            $queriedObject = get_queried_object();
+        } catch (Throwable) {
+            $queriedObject = null;
+        }
+
+        if (isset($queriedObject->post_type)) {
+            return $queriedObject;
+        }
+
+        global $post;
+
+        if (isset($post->post_type)) {
+            return $post;
+        }
+
+        try {
+            $id = get_the_ID();
+
+            if ($id) {
+                $postById = get_post($id);
+
+                if (isset($postById->post_type)) {
+                    return $postById;
+                }
+            }
+        } catch (Throwable) {
+            // No id found
+        }
+
+        if (function_exists('url_to_postid')) {
+            $uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+            $postIdFromUrl = url_to_postid($uri);
+
+            if ($postIdFromUrl) {
+                $postById = get_post($postIdFromUrl);
+
+                if (isset($postById->post_type)) {
+                    return $postById;
+                }
+            }
+        }
+
+        if (function_exists('pll_get_post')) {
+            $baseId = $queriedObject->ID ?? $post->ID ?? null;
+
+            if ($baseId) {
+                $polylangCurrentLanguage = function_exists('pll_current_language') ? pll_current_language() : null;
+                $altId = $polylangCurrentLanguage
+                    ? pll_get_post($baseId, $polylangCurrentLanguage)
+                    : pll_get_post($baseId);
+
+                if ($altId) {
+                    $postById = get_post($altId);
+
+                    if ($postById->post_type) {
+                        return $postById;
+                    }
+                }
+            }
+        }
+
+        $pageName = isset($_GET['pagename']) ? sanitize_text_field($_GET['pagename']) : null;
+        $slug = get_query_var('name') ?: $pageName;
+
+        if ($slug) {
+            $found = get_posts([
+                'name' => $slug,
+                'post_type' => 'landing',
+                'post_status' => 'publish',
+                'numberposts' => 1
+            ]);
+
+            if (!empty($found)) {
+                return $found[0];
+            }
+        }
+
+        return null;
     }
 }

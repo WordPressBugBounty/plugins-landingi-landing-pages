@@ -2,9 +2,9 @@
 Contributors: landingi
 Tags: landing page, landing page builder, landing page embed, landing page import, landing page platform
 Requires at least: 4.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.0
+Stable tag: 4.3.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 

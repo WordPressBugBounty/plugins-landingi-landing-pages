@@ -26,8 +26,23 @@ trait PostTypeTrait
                 return;
             }
 
-            if (!empty($query->query['name'])) {
-                $query->set('post_type', array_merge(get_post_types(), [self::POST_TYPE]));
+            if (is_admin()) {
+                return;
+            }
+
+            if (!empty($query->query['name']) && empty($query->query['post_type'])) {
+                $currentUrl = parse_url(esc_url_raw(add_query_arg([])));
+                $requestPath = isset($currentUrl['path']) ? trim($currentUrl['path'], '/') : '';
+
+                if ('' === $requestPath) {
+                    return;
+                }
+
+                $landing = get_page_by_path($requestPath, OBJECT, self::POST_TYPE);
+
+                if ($landing instanceof \WP_Post) {
+                    $query->set('post_type', [self::POST_TYPE]);
+                }
             }
         });
     }

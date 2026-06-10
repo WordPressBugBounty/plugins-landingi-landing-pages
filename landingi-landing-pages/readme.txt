@@ -4,7 +4,7 @@ Tags: landing page, landing page builder, landing page embed, landing page impor
 Requires at least: 4.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.3.0
+Stable tag: 4.4.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 

@@ -31,8 +31,7 @@ trait PostTypeTrait
             }
 
             if (!empty($query->query['name']) && empty($query->query['post_type'])) {
-                $currentUrl = parse_url(esc_url_raw(add_query_arg([])));
-                $requestPath = isset($currentUrl['path']) ? trim($currentUrl['path'], '/') : '';
+                $requestPath = $this->getLandingRequestPath();
 
                 if ('' === $requestPath) {
                     return;
@@ -72,18 +71,19 @@ trait PostTypeTrait
     public function addPostTemplate($templatePath)
     {
         add_action('do_parse_request', function($doParse, $wp) use ($templatePath) {
-            $currentUrl = parse_url(esc_url_raw(add_query_arg([])));
-            $landingPath = isset($currentUrl['host']) ?
-                sprintf('%s://%s%s', $currentUrl['scheme'], $currentUrl['host'], $currentUrl['path']) :
-                $currentUrl['path'];
+            $landingPath = $this->getLandingRequestPath();
+
+            if ('' === $landingPath) {
+                return $doParse;
+            }
 
             $object = get_page_by_path(
-                trim($landingPath, '/'),
+                $landingPath,
                 OBJECT,
                 self::POST_TYPE
             );
 
-            if (isset($object->post_type) && $object->post_type === 'landing') {
+            if (isset($object->post_type) && $object->post_type === self::POST_TYPE) {
                 $wp->query_vars = ['post_type' => self::POST_TYPE, 'page_id' => $object->ID];
                 $wp->public_query_vars = ['p', 'page', 'name', 'year', 'monthnum', 'day', 'hour', 'minute', 'second', 'post_id', 'category', 'author'];
 
@@ -96,5 +96,30 @@ trait PostTypeTrait
 
             return $doParse;
         }, 10, 2);
+    }
+
+    private function getLandingRequestPath(): string
+    {
+        $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        $requestPath = is_string($requestPath) ? trim($requestPath, '/') : '';
+
+        $installPath = wp_parse_url(site_url(), PHP_URL_PATH);
+        $installPath = is_string($installPath) ? trim($installPath, '/') : '';
+
+        if ('' === $installPath) {
+            return $requestPath;
+        }
+
+        if ($requestPath === $installPath) {
+            return '';
+        }
+
+        $installPrefix = $installPath . '/';
+
+        if (!str_starts_with($requestPath, $installPrefix)) {
+            return '';
+        }
+
+        return substr($requestPath, strlen($installPrefix));
     }
 }

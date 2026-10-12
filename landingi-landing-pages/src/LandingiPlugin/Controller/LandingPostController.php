@@ -11,19 +11,23 @@ use Landingi\Wordpress\Plugin\LandingiPlugin\DomTree\Exception\NodeDoesNotExists
 use Landingi\Wordpress\Plugin\LandingiPlugin\DomTree\Nodes\LightboxHandlerNode;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Model\Landing;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Service\LandendApiClientService;
+use Landingi\Wordpress\Plugin\LandingiPlugin\Service\StaticLandingApiClientService;
 
 class LandingPostController extends PostController
 {
     private LandendApiClientService $landendApiClientService;
+    private StaticLandingApiClientService $staticLandingApiClientService;
 
     public function __construct(
         TwigService $twigService,
         Request $request,
         ConfigCollection $configCollection,
-        LandendApiClientService $landendApiClientService
+        LandendApiClientService $landendApiClientService,
+        StaticLandingApiClientService $staticLandingApiClientService
     ) {
         parent::__construct($twigService, $request, $configCollection);
         $this->landendApiClientService = $landendApiClientService;
+        $this->staticLandingApiClientService = $staticLandingApiClientService;
     }
 
     public function action($customPost = null)
@@ -35,23 +39,40 @@ class LandingPostController extends PostController
             $landingData['id'],
             $landingData['name'],
             $landingData['hash'],
-            $landingData['slug']
+            $landingData['slug'],
+            $landingData['is_static'] ?? false
         );
-        $landing->setTestId($this->request->getCookie('tid'));
         $currentUrl = parse_url(get_permalink());
-        $apiResponse = $this->landendApiClientService->getLandingFromApi(
-            $landing,
-            empty($currentUrl['host']) ? '' : $currentUrl['host'],
-            empty($currentUrl['path']) ? '/' : $currentUrl['path'],
-            $this->request->getGetParameter('hash')
-        );
+        $currentHost = empty($currentUrl['host']) ? '' : $currentUrl['host'];
+        $currentPath = empty($currentUrl['path']) ? '/' : $currentUrl['path'];
+
+        if ($landing->isStatic()) {
+            $apiResponse = $this->staticLandingApiClientService->getLandingFromApi(
+                $landing,
+                $currentHost,
+                $currentPath,
+                $this->request->getGetParameters()
+            );
+        } else {
+            $landing->setTestId($this->request->getCookie('tid'));
+            $apiResponse = $this->landendApiClientService->getLandingFromApi(
+                $landing,
+                $currentHost,
+                $currentPath,
+                $this->request->getGetParameter('hash')
+            );
+        }
 
         if (false === empty($apiResponse['redirect']) && in_array($apiResponse['status_code'], [301, 302], true)) {
+            $redirectUrl = $landing->isStatic()
+                ? $apiResponse['redirect']
+                : $this->removeInternalQueryParameters($apiResponse['redirect']);
+
             return $this->response(
                 'Redirect',
                 $apiResponse['status_code'],
                 [
-                    'Location' => $this->removeInternalQueryParameters($apiResponse['redirect'])
+                    'Location' => $redirectUrl
                 ]
             );
         }
@@ -61,6 +82,10 @@ class LandingPostController extends PostController
                 $apiResponse['content'],
                 $apiResponse['status_code']
             );
+        }
+
+        if ($landing->isStatic()) {
+            return $this->response($apiResponse['content']);
         }
 
         $landing->setContent($apiResponse['content']);

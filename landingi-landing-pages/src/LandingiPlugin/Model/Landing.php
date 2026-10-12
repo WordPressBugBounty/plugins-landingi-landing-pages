@@ -9,15 +9,17 @@ class Landing implements JsonSerializable
     private $name;
     private $hash;
     private $slug;
+    private bool $isStatic;
     private $content;
     private $testId;
 
-    public function __construct($id, $name, $hash, $slug)
+    public function __construct($id, $name, $hash, $slug, $isStatic = false)
     {
         $this->id = $id;
         $this->name = $name;
         $this->hash = $hash;
         $this->slug = $slug;
+        $this->isStatic = filter_var($isStatic, FILTER_VALIDATE_BOOLEAN);
     }
 
     public function getId()
@@ -38,6 +40,11 @@ class Landing implements JsonSerializable
     public function getSlug()
     {
         return $this->slug;
+    }
+
+    public function isStatic(): bool
+    {
+        return $this->isStatic;
     }
 
     public function setContent($content)
@@ -62,6 +69,10 @@ class Landing implements JsonSerializable
 
     public function jsonSerialize(): array
     {
-        return get_object_vars($this);
+        $data = get_object_vars($this);
+        $data['is_static'] = $data['isStatic'];
+        unset($data['isStatic']);
+
+        return $data;
     }
 }

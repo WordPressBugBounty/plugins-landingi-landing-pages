@@ -8,6 +8,7 @@ use Landingi\Wordpress\Plugin\LandingiPlugin\Model\LandingPostType;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Service\ApiClientService;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Service\LandendApiClientService;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Service\PluginInstaller;
+use Landingi\Wordpress\Plugin\LandingiPlugin\Service\StaticLandingApiClientService;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Controller\AdminMenuSettings;
 use Landingi\Wordpress\Plugin\LandingiPlugin\Controller\AdminMenuAvailableLandings;
 
@@ -30,6 +31,11 @@ class LandingiWordpressPlugin extends PluginKernel
 
         $this->containerCollection->set('service.api.landend.client', new LandendApiClientService(
             $this->getConfig('landingi_export_url')
+        ));
+
+        $this->containerCollection->set('service.api.static_landing.client', new StaticLandingApiClientService(
+            $this->getConfig('landingi_static_export_url'),
+            $this->getConfig('landingi_not_found_url')
         ));
 
         $this->containerCollection->set(
@@ -57,7 +63,8 @@ class LandingiWordpressPlugin extends PluginKernel
             $this->containerCollection->get('framework.twig'),
             $this->containerCollection->get('framework.http.request'),
             $this->configCollection,
-            $this->containerCollection->get('service.api.landend.client')
+            $this->containerCollection->get('service.api.landend.client'),
+            $this->containerCollection->get('service.api.static_landing.client')
         ));
 
         $this->compileCollections();

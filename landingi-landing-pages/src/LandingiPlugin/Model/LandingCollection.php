@@ -13,7 +13,8 @@ class LandingCollection
                 $landing['id'],
                 $landing['name'],
                 $landing['hash'],
-                $landing['slug']
+                $landing['slug'],
+                $landing['is_static'] ?? false
             );
         }
 

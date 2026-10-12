@@ -27,7 +27,11 @@ class ApiClientService
     public function getLandingsForAccount(int $page = 1, ?string $searchPhrase = ''): mixed
     {
         try {
-            $request = $this->get($this->landingListPath, ['page' => $page, 'searchPhrase' => $searchPhrase]);
+            $request = $this->get($this->landingListPath, [
+                'page' => $page,
+                'searchPhrase' => $searchPhrase,
+                'include_static' => 'true',
+            ]);
         } catch (ClientException $exception) {
             throw new InvalidTokenException();
         } catch (ServerException $exception) {
